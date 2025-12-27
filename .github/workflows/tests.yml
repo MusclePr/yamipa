@@ -62,7 +62,7 @@ jobs:
           if [ $FLAVOR == "bukkit" ] && [ $VERSION == "1.17.1" ]; then
             url="https://static.knarcraft.net/archive/downloads/minecraftserverjars/Bukkit/craftbukkit-1.17.1.jar"
           elif [ $FLAVOR == "spigot" ] && [ $VERSION == "1.17.1" ]; then
-            url="https://s3.mcjars.app/spigot/1.17.1/3284/server.jar"
+            url="https://files.mcjars.app/spigot/1.17.1/3284/server.jar"
           elif [ $FLAVOR == "bukkit" ]; then
             url="https://cdn.getbukkit.org/craftbukkit/craftbukkit-$VERSION.jar"
           elif [ $FLAVOR == "spigot" ]; then
