@@ -89,7 +89,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://jitpack.io/com/github/GriefPrevention/GriefPrevention/ -->
+        <!-- https://github.com/GriefPrevention/GriefPrevention/releases -->
         <dependency>
             <groupId>com.github.GriefPrevention</groupId>
             <artifactId>GriefPrevention</artifactId>
@@ -97,15 +97,15 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://jitpack.io/com/github/TownyAdvanced/towny/ -->
+        <!-- https://github.com/TownyAdvanced/Towny/releases -->
         <dependency>
             <groupId>com.github.TownyAdvanced.Towny</groupId>
             <artifactId>towny</artifactId>
-            <version>0.101.2.7</version>
+            <version>0.102.0.2</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://jitpack.io/com/github/Angeschossen/LandsAPI/ -->
+        <!-- http://github.com/Angeschossen/LandsAPI/releases -->
         <dependency>
             <groupId>com.github.Angeschossen</groupId>
             <artifactId>LandsAPI</artifactId>
