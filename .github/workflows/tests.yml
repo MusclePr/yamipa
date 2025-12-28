@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavor: ['bukkit', 'spigot', 'paper', 'purpur']
+        flavor: ['spigot', 'paper', 'purpur']
         version: ['1.21.11', '1.21.8', '1.20.6', '1.19.4', '1.18.2', '1.17.1', '1.16.5']
     steps:
       # Download code from repository
@@ -59,12 +59,8 @@ jobs:
           FLAVOR: ${{ matrix.flavor }}
           VERSION: ${{ matrix.version }}
         run: |
-          if [ $FLAVOR == "bukkit" ] && [ $VERSION == "1.17.1" ]; then
-            url="https://static.knarcraft.net/archive/downloads/minecraftserverjars/Bukkit/craftbukkit-1.17.1.jar"
-          elif [ $FLAVOR == "spigot" ] && [ $VERSION == "1.17.1" ]; then
+          if [ $FLAVOR == "spigot" ] && [ $VERSION == "1.17.1" ]; then
             url="https://files.mcjars.app/spigot/1.17.1/3284/server.jar"
-          elif [ $FLAVOR == "bukkit" ]; then
-            url="https://cdn.getbukkit.org/craftbukkit/craftbukkit-$VERSION.jar"
           elif [ $FLAVOR == "spigot" ]; then
             url="https://cdn.getbukkit.org/spigot/spigot-$VERSION.jar"
           elif [ $FLAVOR == "paper" ]; then
@@ -144,7 +140,7 @@ jobs:
             echo "Plugin did not remove the fake image"
             exit 1
           fi
-          if [ "$FLAVOR" != "bukkit" ] && [ "$FLAVOR" != "spigot" ] && grep -iFq 'exception' server.log; then
+          if [ "$FLAVOR" != "spigot" ] && grep -iFq 'exception' server.log; then
             echo "Server threw an exception"
             exit 1
           fi
