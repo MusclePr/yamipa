@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@SuppressWarnings("deprecation")
 public class ImageCommand {
     private static final int ITEMS_PER_PAGE = 9;
     private static final int MAX_PATH_DEPTH = 10;

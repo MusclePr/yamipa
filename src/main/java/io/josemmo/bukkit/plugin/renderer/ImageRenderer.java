@@ -447,16 +447,22 @@ public class ImageRenderer implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerTeleport(@NotNull PlayerTeleportEvent event) {
+        //noinspection ConstantValue
         if (event.getTo() == null) return;
         if (event.getFrom().getChunk().equals(event.getTo().getChunk())) return;
 
         // Wait until next server tick before handling location change
         // This is necessary as teleport events get fired *before* teleporting the player
-        YamipaPlugin.getInstance().getScheduler().runInGame(() -> onPlayerLocationChange(event.getPlayer(), event.getTo()));
+        Location location = event.getTo();
+        YamipaPlugin.getInstance().getScheduler().runInGame(
+            () -> onPlayerLocationChange(event.getPlayer(), location),
+            location
+        );
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
+        //noinspection ConstantValue
         if (event.getTo() == null) return;
         if (event.getFrom().getChunk().equals(event.getTo().getChunk())) return;
         onPlayerLocationChange(event.getPlayer(), event.getTo());
