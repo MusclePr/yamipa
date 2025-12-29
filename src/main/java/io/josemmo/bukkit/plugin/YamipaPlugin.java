@@ -7,6 +7,7 @@ import io.josemmo.bukkit.plugin.utils.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -80,8 +81,20 @@ public class YamipaPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Initialize configuration
+        FileConfiguration config = getConfig();
+        config.addDefault("verbose", false);
+        config.addDefault("animate-images", true);
+        config.addDefault("images-path", "images");
+        config.addDefault("cache-path", "cache");
+        config.addDefault("data-path", "images.dat");
+        config.addDefault("allowed-paths", null);
+        config.addDefault("max-image-dimension", 30);
+        config.options().copyDefaults(true);
+        saveConfig();
+
         // Initialize logger
-        verbose = getConfig().getBoolean("verbose", false);
+        verbose = config.getBoolean("verbose");
         if (verbose) {
             LOGGER.info("Running on VERBOSE mode");
         }
@@ -91,12 +104,12 @@ public class YamipaPlugin extends JavaPlugin {
 
         // Read plugin configuration paths
         Path basePath = getDataFolder().toPath();
-        String imagesPath = getConfig().getString("images-path", "images");
-        String cachePath = getConfig().getString("cache-path", "cache");
-        String dataPath = getConfig().getString("data-path", "images.dat");
+        String imagesPath = Objects.requireNonNull(config.getString("images-path"));
+        String cachePath = Objects.requireNonNull(config.getString("cache-path"));
+        String dataPath = Objects.requireNonNull(config.getString("data-path"));
 
         // Create image storage
-        String allowedPaths = getConfig().getString("allowed-paths", "");
+        String allowedPaths = config.getString("allowed-paths", "");
         storage = new ImageStorage(
             basePath.resolve(imagesPath).toAbsolutePath().normalize(),
             basePath.resolve(cachePath).toAbsolutePath().normalize(),
@@ -109,9 +122,9 @@ public class YamipaPlugin extends JavaPlugin {
         }
 
         // Create image renderer
-        boolean animateImages = getConfig().getBoolean("animate-images", true);
+        boolean animateImages = config.getBoolean("animate-images");
         LOGGER.info(animateImages ? "Enabled image animation support" : "Image animation support is disabled");
-        int maxImageDimension = getConfig().getInt("max-image-dimension", 30);
+        int maxImageDimension = config.getInt("max-image-dimension");
         renderer = new ImageRenderer(basePath.resolve(dataPath), animateImages, maxImageDimension);
         renderer.start();
 
