@@ -49,13 +49,15 @@ shouldn't modify its contents.
 You can change the path of these files by creating a `config.yml` file in the plugin configuration directory.
 Here are the default configuration values if you don't specify them:
 ```yaml
-verbose: false           # Set to "true" to enable more verbose logging
-animate-images: true     # Set to "false" to disable GIF support
-images-path: images      # Path to images directory
-cache-path: cache        # Path to cache directory
-data-path: images.dat    # Path to placed images database file
-allowed-paths: null      # Set to a RegExp to limit accessible images to players
-max-image-dimension: 30  # Maximum width or height in blocks allowed in images
+command-name: yamipa              # Name of the root command
+command-aliases: [image, images]  # Aliases for the root command, can be an empty list
+verbose: false                    # Set to "true" to enable more verbose logging
+animate-images: true              # Set to "false" to disable GIF support
+images-path: images               # Path to images directory
+cache-path: cache                 # Path to cache directory
+data-path: images.dat             # Path to placed images database file
+allowed-paths: null               # Set to a RegExp to limit accessible images to players
+max-image-dimension: 30           # Maximum width or height in blocks allowed in images
 ```
 
 For more information on how to set a different `allowed-paths` or `max-image-dimension` value per player, see the

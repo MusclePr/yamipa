@@ -14,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.awt.Color;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -83,6 +85,8 @@ public class YamipaPlugin extends JavaPlugin {
     public void onEnable() {
         // Initialize configuration
         FileConfiguration config = getConfig();
+        config.addDefault("command-name", "yamipa");
+        config.addDefault("command-aliases", Arrays.asList("image", "images"));
         config.addDefault("verbose", false);
         config.addDefault("animate-images", true);
         config.addDefault("images-path", "images");
@@ -100,7 +104,9 @@ public class YamipaPlugin extends JavaPlugin {
         }
 
         // Register plugin commands
-        ImageCommandBridge.register(this);
+        String commandName = Objects.requireNonNull(config.getString("command-name"));
+        List<String> commandAliases = config.getStringList("command-aliases");
+        ImageCommandBridge.register(commandName, commandAliases);
 
         // Read plugin configuration paths
         Path basePath = getDataFolder().toPath();
