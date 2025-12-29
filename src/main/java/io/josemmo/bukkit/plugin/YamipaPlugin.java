@@ -4,9 +4,9 @@ import io.josemmo.bukkit.plugin.commands.ImageCommandBridge;
 import io.josemmo.bukkit.plugin.renderer.*;
 import io.josemmo.bukkit.plugin.storage.ImageStorage;
 import io.josemmo.bukkit.plugin.utils.Logger;
+import io.josemmo.bukkit.plugin.utils.Scheduler;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,8 +17,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 public class YamipaPlugin extends JavaPlugin {
@@ -26,10 +24,10 @@ public class YamipaPlugin extends JavaPlugin {
     private static final Logger LOGGER = Logger.getLogger();
     private static @Nullable YamipaPlugin INSTANCE;
     private boolean verbose;
+    private @Nullable Scheduler scheduler;
     private @Nullable ImageStorage storage;
     private @Nullable ImageRenderer renderer;
     private @Nullable ItemService itemService;
-    private @Nullable ScheduledExecutorService scheduler;
     private @Nullable Metrics metrics;
 
     /**
@@ -39,6 +37,15 @@ public class YamipaPlugin extends JavaPlugin {
     public static @NotNull YamipaPlugin getInstance() {
         Objects.requireNonNull(INSTANCE, "Cannot get plugin instance if plugin is not running");
         return INSTANCE;
+    }
+
+    /**
+     * Get tasks scheduler
+     * @return Tasks scheduler
+     */
+    public @NotNull Scheduler getScheduler() {
+        Objects.requireNonNull(scheduler, "Cannot get scheduler instance if plugin is not running");
+        return scheduler;
     }
 
     /**
@@ -57,15 +64,6 @@ public class YamipaPlugin extends JavaPlugin {
     public @NotNull ImageRenderer getRenderer() {
         Objects.requireNonNull(renderer, "Cannot get renderer instance if plugin is not running");
         return renderer;
-    }
-
-    /**
-     * Get internal tasks scheduler
-     * @return Tasks scheduler
-     */
-    public @NotNull ScheduledExecutorService getScheduler() {
-        Objects.requireNonNull(scheduler, "Cannot get scheduler instance if plugin is not running");
-        return scheduler;
     }
 
     /**
@@ -103,6 +101,9 @@ public class YamipaPlugin extends JavaPlugin {
             LOGGER.info("Running on VERBOSE mode");
         }
 
+        // Create scheduler
+        scheduler = new Scheduler();
+
         // Register plugin commands
         String commandName = Objects.requireNonNull(config.getString("command-name"));
         List<String> commandAliases = config.getStringList("command-aliases");
@@ -137,9 +138,6 @@ public class YamipaPlugin extends JavaPlugin {
         // Create image item service
         itemService = new ItemService();
         itemService.start();
-
-        // Create thread pool
-        scheduler = Executors.newScheduledThreadPool(6);
 
         // Warm-up plugin dependencies
         LOGGER.fine("Triggered map color cache warm-up");
@@ -186,15 +184,14 @@ public class YamipaPlugin extends JavaPlugin {
             storage = null;
         }
 
-        // Stop internal scheduler
+        // Stop scheduler
         if (scheduler != null) {
-            scheduler.shutdownNow();
+            scheduler.stop();
             scheduler = null;
         }
 
-        // Remove Bukkit listeners and tasks
+        // Remove Bukkit listeners
         HandlerList.unregisterAll(this);
-        Bukkit.getScheduler().cancelTasks(this);
 
         // Unlink reference to instance
         INSTANCE = null;

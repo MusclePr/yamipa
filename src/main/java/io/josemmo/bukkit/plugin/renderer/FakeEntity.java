@@ -5,7 +5,6 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.injector.netty.manager.NetworkManagerInjector;
-import io.josemmo.bukkit.plugin.YamipaPlugin;
 import io.josemmo.bukkit.plugin.utils.Internals;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import org.bukkit.entity.Player;
@@ -88,13 +87,5 @@ public abstract class FakeEntity {
             container.getPacketBundles().write(0, packets);
             tryToSendPacket(player, container);
         }
-    }
-
-    /**
-     * Try to run asynchronous task
-     * @param callback Callback to execute
-     */
-    protected static void tryToRunAsyncTask(@NotNull Runnable callback) {
-        YamipaPlugin.getInstance().getScheduler().execute(callback);
     }
 }

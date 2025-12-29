@@ -7,6 +7,7 @@ import io.josemmo.bukkit.plugin.storage.ImageFile;
 import io.josemmo.bukkit.plugin.utils.DirectionUtils;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import io.josemmo.bukkit.plugin.utils.Permissions;
+import io.josemmo.bukkit.plugin.utils.Scheduler;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Rotation;
@@ -20,7 +21,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
 public class FakeImage extends FakeEntity {
@@ -389,11 +389,10 @@ public class FakeImage extends FakeEntity {
         YamipaPlugin plugin = YamipaPlugin.getInstance();
         boolean isAnimationEnabled = plugin.getRenderer().isAnimationEnabled();
         if (isAnimationEnabled && task == null && hasFlag(FLAG_ANIMATABLE) && numOfSteps > 1) {
-            task = plugin.getScheduler().scheduleAtFixedRate(
+            task = plugin.getScheduler().runInterval(
                 this::nextStep,
                 0,
-                delay*50L,
-                TimeUnit.MILLISECONDS
+                delay*50L
             );
             LOGGER.fine("Spawned animation task for FakeImage#(" + location + "," + face + ")");
         }
@@ -411,6 +410,7 @@ public class FakeImage extends FakeEntity {
      */
     public void spawn(@NotNull Player player) {
         LOGGER.fine("Received request to spawn FakeImage#(" + location + "," + face + ") for Player#" + player.getName());
+        Scheduler scheduler = YamipaPlugin.getInstance().getScheduler();
 
         // Send pixels if instance is already loaded
         if (frames != null) {
@@ -420,7 +420,7 @@ public class FakeImage extends FakeEntity {
 
         // Wait for instance to load if loading
         if (loading) {
-            tryToRunAsyncTask(() -> {
+            scheduler.run(() -> {
                 while (loading) {
                     tryToSleep(5);
                 }
@@ -431,7 +431,7 @@ public class FakeImage extends FakeEntity {
 
         // Instance needs to be loaded
         loading = true;
-        tryToRunAsyncTask(() -> {
+        scheduler.run(() -> {
             load();
             loading = false;
             spawnOnceLoaded(player);

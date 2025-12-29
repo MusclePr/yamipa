@@ -13,7 +13,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
@@ -22,16 +21,17 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class ImageRenderer implements Listener {
-    private static final long SAVE_INTERVAL = 20L * 90; // In server ticks
+    private static final long SAVE_INTERVAL = 90000; // In milliseconds
     private static final Logger LOGGER = Logger.getLogger("ImageRenderer");
     private final Path configPath;
     private final boolean animateImages;
     private final int maxImageDimension;
-    private BukkitTask saveTask;
+    private @Nullable ScheduledFuture<?> saveTask;
     private final AtomicBoolean hasConfigChanged = new AtomicBoolean(false);
     private final ConcurrentMap<WorldAreaId, Set<FakeImage>> images = new ConcurrentHashMap<>();
     private final ConcurrentMap<UUID, Integer> imagesCountByPlayer = new ConcurrentHashMap<>();
@@ -72,7 +72,7 @@ public class ImageRenderer implements Listener {
         loadConfig();
         YamipaPlugin plugin = YamipaPlugin.getInstance();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::saveConfig, SAVE_INTERVAL, SAVE_INTERVAL);
+        saveTask = plugin.getScheduler().runInterval(this::saveConfig, SAVE_INTERVAL, SAVE_INTERVAL);
     }
 
     /**
@@ -90,7 +90,7 @@ public class ImageRenderer implements Listener {
 
         // Persist configuration
         if (saveTask != null) {
-            saveTask.cancel();
+            saveTask.cancel(true);
         }
         saveConfig();
 
@@ -452,8 +452,7 @@ public class ImageRenderer implements Listener {
 
         // Wait until next server tick before handling location change
         // This is necessary as teleport events get fired *before* teleporting the player
-        YamipaPlugin plugin = YamipaPlugin.getInstance();
-        Bukkit.getScheduler().runTask(plugin, () -> onPlayerLocationChange(event.getPlayer(), event.getTo()));
+        YamipaPlugin.getInstance().getScheduler().runInGame(() -> onPlayerLocationChange(event.getPlayer(), event.getTo()));
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
