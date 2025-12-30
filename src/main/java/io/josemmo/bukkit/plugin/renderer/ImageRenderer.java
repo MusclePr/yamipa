@@ -173,7 +173,7 @@ public class ImageRenderer implements Listener {
             UUID placedById = fakeImage.getPlacedBy().getUniqueId();
             String[] row = new String[]{
                 fakeImage.getFilename(),
-                location.getChunk().getWorld().getName(),
+                location.getWorld().getName(),
                 location.getBlockX() + "",
                 location.getBlockY() + "",
                 location.getBlockZ() + "",
@@ -447,9 +447,7 @@ public class ImageRenderer implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerTeleport(@NotNull PlayerTeleportEvent event) {
-        //noinspection ConstantValue
-        if (event.getTo() == null) return;
-        if (event.getFrom().getChunk().equals(event.getTo().getChunk())) return;
+        if (isSameWorldArea(event.getFrom(), event.getTo())) return;
 
         // Wait until next server tick before handling location change
         // This is necessary as teleport events get fired *before* teleporting the player
@@ -462,9 +460,7 @@ public class ImageRenderer implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
-        //noinspection ConstantValue
-        if (event.getTo() == null) return;
-        if (event.getFrom().getChunk().equals(event.getTo().getChunk())) return;
+        if (isSameWorldArea(event.getFrom(), event.getTo())) return;
         onPlayerLocationChange(event.getPlayer(), event.getTo());
     }
 
@@ -472,11 +468,23 @@ public class ImageRenderer implements Listener {
     public void onVehicleMove(@NotNull VehicleMoveEvent event) {
         List<Entity> passengers = event.getVehicle().getPassengers();
         if (passengers.isEmpty()) return;
-        if (event.getFrom().getChunk().equals(event.getTo().getChunk())) return;
+        if (isSameWorldArea(event.getFrom(), event.getTo())) return;
         for (Entity passenger : passengers) {
             if (passenger instanceof Player) {
                 onPlayerLocationChange((Player) passenger, event.getTo());
             }
         }
+    }
+
+    /**
+     * Is same world area
+     * @param  a Location A
+     * @param  b Location B
+     * @return   Whether both locations are in the same world area
+     */
+    private boolean isSameWorldArea(@NotNull Location a, @NotNull Location b) {
+        WorldAreaId fromArea = WorldAreaId.fromLocation(a);
+        WorldAreaId toArea = WorldAreaId.fromLocation(b);
+        return fromArea.equals(toArea);
     }
 }

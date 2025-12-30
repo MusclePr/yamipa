@@ -354,8 +354,7 @@ public class ImageCommand {
 
             // Basic information
             player.sendMessage(ChatColor.GOLD + "Filename: " + ChatColor.RESET + image.getFilename());
-            player.sendMessage(ChatColor.GOLD + "World: " + ChatColor.RESET +
-                image.getLocation().getChunk().getWorld().getName());
+            player.sendMessage(ChatColor.GOLD + "World: " + ChatColor.RESET + image.getLocation().getWorld().getName());
             player.sendMessage(ChatColor.GOLD + "Coordinates: " + ChatColor.RESET +
                 image.getLocation().getBlockX() + ", " +
                 image.getLocation().getBlockY() + ", " +
