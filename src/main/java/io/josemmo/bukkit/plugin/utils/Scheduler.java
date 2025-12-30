@@ -75,7 +75,7 @@ public class Scheduler {
         // Run in another thread
         YamipaPlugin plugin = YamipaPlugin.getInstance();
         if (Internals.IS_FOLIA) {
-            Bukkit.getRegionScheduler().execute(plugin, location, wrappedCommand);
+            Bukkit.getRegionScheduler().run(plugin, location, __ -> wrappedCommand.run());
         } else {
             Bukkit.getScheduler().runTask(plugin, wrappedCommand);
         }
