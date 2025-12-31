@@ -39,7 +39,7 @@ public class Internals {
             // Detect Folia
             boolean isFolia;
             try {
-                Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
+                Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
                 isFolia = true;
             } catch (ClassNotFoundException __) {
                 isFolia = false;
