@@ -33,7 +33,7 @@ Here are the Minecraft distributions where Yamipa should be able to run:
 |            1.16.x |   ✅    |   ✅     |   ✅    |       |
 |     1.17 & 1.17.1 |   ✅    |   ✅     |   ✅    |       |
 |     1.18 & 1.18.x |   ✅    |   ✅     |   ✅    |       |
-|     1.19 & 1.19.x |   ✅    |   ✅     |   ✅    |   ✅   |
+|     1.19 & 1.19.x |   ✅    |   ✅     |   ✅    |       |
 |     1.20 & 1.20.x |   ✅    |   ✅     |   ✅    |   ✅   |
 |     1.21 & 1.21.x |   ✅    |   ✅     |   ✅    |   ✅   |
 

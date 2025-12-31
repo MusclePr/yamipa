@@ -19,6 +19,8 @@ jobs:
             version: 1.17.1
           - flavor: folia
             version: 1.18.2
+          - flavor: folia
+            version: 1.19.4
     steps:
       # Download code from repository
       - name: Checkout code
