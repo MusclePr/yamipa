@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 
 public abstract class FakeEntity {
     private static final Logger LOGGER = Logger.getLogger("FakeEntity");
@@ -46,7 +45,7 @@ public abstract class FakeEntity {
     public static void initialize() {
         LOGGER.fine("Initializing ProtocolLib...");
         try {
-            WrappedDataWatcher.Registry.get((Type) Byte.class);
+            WrappedDataWatcher.Registry.getVectorSerializer();
             LOGGER.fine("ProtocolLib is now ready");
         } catch (Exception e) {
             LOGGER.severe("Failed to initialize ProtocolLib, images may not render for first player joining", e);
