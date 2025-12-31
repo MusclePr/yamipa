@@ -5,12 +5,14 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.injector.netty.manager.NetworkManagerInjector;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import io.josemmo.bukkit.plugin.utils.Internals;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 public abstract class FakeEntity {
     private static final Logger LOGGER = Logger.getLogger("FakeEntity");
@@ -31,6 +33,23 @@ public abstract class FakeEntity {
             }
         } catch (Exception e) {
             LOGGER.severe("Failed to get NetworkManagerInjector from ProtocolLib", e);
+        }
+    }
+
+    /**
+     * Initialize ProtocolLib
+     * <p>
+     * Fix for ProtocolLib not being ready when the first network packets are being sent by the library.
+     * Without calling this method, some packets are missed when the first player joins the server since boot,
+     * causing images to not be rendered.
+     */
+    public static void initialize() {
+        LOGGER.fine("Initializing ProtocolLib...");
+        try {
+            WrappedDataWatcher.Registry.get((Type) Byte.class);
+            LOGGER.fine("ProtocolLib is now ready");
+        } catch (Exception e) {
+            LOGGER.severe("Failed to initialize ProtocolLib, images may not render for first player joining", e);
         }
     }
 

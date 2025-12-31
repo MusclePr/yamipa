@@ -142,6 +142,7 @@ public class YamipaPlugin extends JavaPlugin {
         // Warm-up plugin dependencies
         LOGGER.fine("Triggered map color cache warm-up");
         FakeMap.pixelToIndex(Color.RED.getRGB()); // Ask for a color index to force cache generation
+        FakeEntity.initialize();
 
         // Initialize bStats
         Function<Integer, String> toStats = number -> {
