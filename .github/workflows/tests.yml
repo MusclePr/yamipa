@@ -10,8 +10,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavor: ['spigot', 'paper', 'purpur']
+        flavor: ['spigot', 'paper', 'purpur', 'folia']
         version: ['1.21.11', '1.21.8', '1.20.6', '1.19.4', '1.18.2', '1.17.1', '1.16.5']
+        exclude:
+          - flavor: folia
+            version: 1.16.5
+          - flavor: folia
+            version: 1.17.1
+          - flavor: folia
+            version: 1.18.2
     steps:
       # Download code from repository
       - name: Checkout code
@@ -67,6 +74,8 @@ jobs:
             url=$(curl "https://fill.papermc.io/v3/projects/paper/versions/$VERSION/builds" | jq -r 'first(.[].downloads."server:default".url)')
           elif [ $FLAVOR == "purpur" ]; then
             url="https://api.purpurmc.org/v2/purpur/$VERSION/latest/download"
+          elif [ $FLAVOR == "folia" ]; then
+            url=$(curl "https://fill.papermc.io/v3/projects/folia/versions/$VERSION/builds" | jq -r 'first(.[].downloads."server:default".url)')
           fi
           mkdir ./server && cd ./server
           wget -nv "$url" -O server.jar
