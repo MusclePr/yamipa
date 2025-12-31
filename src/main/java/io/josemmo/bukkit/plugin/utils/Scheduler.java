@@ -54,10 +54,12 @@ public class Scheduler {
         // Run in game thread
         YamipaPlugin plugin = YamipaPlugin.getInstance();
         long effectiveDelayInTicks = Math.max(0, delayInTicks);
-        if (Internals.IS_FOLIA) {
-            Bukkit.getGlobalRegionScheduler().runDelayed(plugin, __ -> command.run(), effectiveDelayInTicks);
-        } else {
+        if (!Internals.IS_FOLIA) {
             Bukkit.getScheduler().runTaskLater(plugin, command, effectiveDelayInTicks);
+        } else if (effectiveDelayInTicks == 0) {
+            Bukkit.getGlobalRegionScheduler().run(plugin, __ -> command.run());
+        } else {
+            Bukkit.getGlobalRegionScheduler().runDelayed(plugin, __ -> command.run(), effectiveDelayInTicks);
         }
     }
 
@@ -90,10 +92,12 @@ public class Scheduler {
         // Run in another thread
         YamipaPlugin plugin = YamipaPlugin.getInstance();
         long effectiveDelayInTicks = Math.max(0, delayInTicks);
-        if (Internals.IS_FOLIA) {
-            Bukkit.getRegionScheduler().runDelayed(plugin, location, __ -> wrappedCommand.run(), effectiveDelayInTicks);
-        } else {
+        if (!Internals.IS_FOLIA) {
             Bukkit.getScheduler().runTaskLater(plugin, wrappedCommand, effectiveDelayInTicks);
+        } else if (effectiveDelayInTicks == 0) {
+            Bukkit.getRegionScheduler().run(plugin, location, __ -> wrappedCommand.run());
+        } else {
+            Bukkit.getRegionScheduler().runDelayed(plugin, location, __ -> wrappedCommand.run(), effectiveDelayInTicks);
         }
     }
 
