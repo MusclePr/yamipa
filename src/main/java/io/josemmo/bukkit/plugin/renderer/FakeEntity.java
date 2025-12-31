@@ -54,21 +54,6 @@ public abstract class FakeEntity {
     }
 
     /**
-     * Try to sleep
-     * <p>
-     * NOTE: Will wait synchronously, blocking the invoker thread
-     * @param ms Delay in milliseconds
-     */
-    @SuppressWarnings("SameParameterValue")
-    protected static void tryToSleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (Exception __) {
-            // Fail silently
-        }
-    }
-
-    /**
      * Try to send packet
      * @param player Player who will receive the packet
      * @param packet Packet to send
