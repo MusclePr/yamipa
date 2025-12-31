@@ -34,7 +34,7 @@ public class WorldAreaId {
      * @return          World area ID
      */
     public static @NotNull WorldAreaId fromLocation(@NotNull Location location) {
-        return new WorldAreaId(location.getWorld(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        return new WorldAreaId(location.getWorld(), location.getBlockX() >> 6, location.getBlockZ() >> 6);
     }
 
     /**
