@@ -160,7 +160,7 @@ public class Permissions {
             } catch (Exception e) {
                 future.completeExceptionally(e);
             }
-        }, location);
+        }, location, -1);
 
         // Get result
         try {

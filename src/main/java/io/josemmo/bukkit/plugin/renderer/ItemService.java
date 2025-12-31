@@ -222,7 +222,8 @@ public class ItemService extends InteractWithEntityListener implements Listener 
             Location dropLocation = location.clone().add(0.5, -0.5, 0.5).add(face.getDirection());
             YamipaPlugin.getInstance().getScheduler().runInGame(
                 () -> block.getWorld().dropItem(dropLocation, imageItem),
-                dropLocation
+                dropLocation,
+                0
             );
         }
 

@@ -454,7 +454,8 @@ public class ImageRenderer implements Listener {
         Location location = event.getTo();
         YamipaPlugin.getInstance().getScheduler().runInGame(
             () -> onPlayerLocationChange(event.getPlayer(), location),
-            location
+            location,
+            0
         );
     }
 

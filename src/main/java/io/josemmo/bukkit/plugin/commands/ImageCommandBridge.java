@@ -53,7 +53,7 @@ public class ImageCommandBridge {
                 fixPermissions(alias);
             }
             LOGGER.fine("Fixed command permissions");
-        });
+        }, 0);
     }
 
     /**

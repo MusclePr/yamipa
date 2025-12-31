@@ -67,7 +67,7 @@ public abstract class InteractWithEntityListener implements PacketListener {
             } finally {
                 ProtocolLibrary.getProtocolManager().getAsynchronousManager().signalPacketTransmission(event);
             }
-        }, event.getPlayer().getLocation());
+        }, event.getPlayer().getLocation(), -1);
     }
 
     /**

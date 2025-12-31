@@ -4,6 +4,7 @@ import io.josemmo.bukkit.plugin.YamipaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -33,51 +34,66 @@ public class Scheduler {
     }
 
     /**
-     * Run in next game tick
-     * @param command Task to execute
+     * Run in game thread
+     * @param command      Task to execute
+     * @param delayInTicks Delay in ticks (<code>-1</code> to run immediately if possible, <code>0</code> to run in next tick)
      */
-    public void runInGame(@NotNull Runnable command) {
-        // Are we already running in the expected thread?
-        boolean alreadyInThread = Internals.IS_FOLIA ? Bukkit.isGlobalTickThread() : Bukkit.isPrimaryThread();
-        if (alreadyInThread) {
-            command.run();
-            return;
+    public void runInGame(
+        @NotNull Runnable command,
+        @Range(from = -1, to = Long.MAX_VALUE) long delayInTicks
+    ) {
+        // Attempt to run immediately if we're running in the target thread
+        if (delayInTicks == -1) {
+            boolean alreadyInThread = Internals.IS_FOLIA ? Bukkit.isGlobalTickThread() : Bukkit.isPrimaryThread();
+            if (alreadyInThread) {
+                command.run();
+                return;
+            }
         }
 
         // Run in game thread
         YamipaPlugin plugin = YamipaPlugin.getInstance();
+        long effectiveDelayInTicks = Math.max(0, delayInTicks);
         if (Internals.IS_FOLIA) {
-            Bukkit.getGlobalRegionScheduler().run(plugin, __ -> command.run());
+            Bukkit.getGlobalRegionScheduler().runDelayed(plugin, __ -> command.run(), effectiveDelayInTicks);
         } else {
-            Bukkit.getScheduler().runTask(plugin, command);
+            Bukkit.getScheduler().runTaskLater(plugin, command, effectiveDelayInTicks);
         }
     }
 
     /**
-     * Run in next game tick
-     * @param command  Task to execute
-     * @param location Location to find region task scheduler (for Folia)
+     * Run in game thread
+     * @param command      Task to execute
+     * @param location     Location to find region task scheduler (for Folia)
+     * @param delayInTicks Delay in ticks (<code>-1</code> to run immediately if possible, <code>0</code> to run in next tick)
      */
-    public void runInGame(@NotNull Runnable command, @NotNull Location location) {
+    public void runInGame(
+        @NotNull Runnable command,
+        @NotNull Location location,
+        @Range(from = -1, to = Long.MAX_VALUE) long delayInTicks
+    ) {
         Runnable wrappedCommand = () -> {
             if (isRunning) {
                 command.run();
             }
         };
 
-        // Are we already running in the expected thread?
-        boolean alreadyInThread = Internals.IS_FOLIA ? Bukkit.isOwnedByCurrentRegion(location) : Bukkit.isPrimaryThread();
-        if (alreadyInThread) {
-            wrappedCommand.run();
-            return;
+        // Attempt to run immediately if we're running in the target thread
+        if (delayInTicks == -1) {
+            boolean alreadyInThread = Internals.IS_FOLIA ? Bukkit.isOwnedByCurrentRegion(location) : Bukkit.isPrimaryThread();
+            if (alreadyInThread) {
+                wrappedCommand.run();
+                return;
+            }
         }
 
         // Run in another thread
         YamipaPlugin plugin = YamipaPlugin.getInstance();
+        long effectiveDelayInTicks = Math.max(0, delayInTicks);
         if (Internals.IS_FOLIA) {
-            Bukkit.getRegionScheduler().run(plugin, location, __ -> wrappedCommand.run());
+            Bukkit.getRegionScheduler().runDelayed(plugin, location, __ -> wrappedCommand.run(), effectiveDelayInTicks);
         } else {
-            Bukkit.getScheduler().runTask(plugin, wrappedCommand);
+            Bukkit.getScheduler().runTaskLater(plugin, wrappedCommand, effectiveDelayInTicks);
         }
     }
 
