@@ -1,6 +1,7 @@
 package io.josemmo.bukkit.plugin.commands;
 
 import io.josemmo.bukkit.plugin.YamipaPlugin;
+import io.josemmo.bukkit.plugin.interaction.SelectBlockOrImageTask;
 import io.josemmo.bukkit.plugin.renderer.FakeImage;
 import io.josemmo.bukkit.plugin.renderer.ImageRenderer;
 import io.josemmo.bukkit.plugin.renderer.ItemService;
@@ -8,7 +9,6 @@ import io.josemmo.bukkit.plugin.storage.ImageFile;
 import io.josemmo.bukkit.plugin.storage.ImageStorage;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import io.josemmo.bukkit.plugin.utils.Permissions;
-import io.josemmo.bukkit.plugin.utils.SelectBlockTask;
 import io.josemmo.bukkit.plugin.utils.ActionBar;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
@@ -211,9 +211,10 @@ public class ImageCommand {
         final int finalHeight = (height == 0) ? FakeImage.getProportionalHeight(sizeInPixels, player, width) : height;
 
         // Ask player where to place image
-        SelectBlockTask task = new SelectBlockTask(player);
-        task.onSuccess((location, face) -> placeImage(player, image, width, finalHeight, flags, location, face));
-        task.onFailure(() -> ActionBar.send(player, ChatColor.RED + "Image placing canceled"));
+        SelectBlockOrImageTask task = new SelectBlockOrImageTask(player);
+        task.onBlock((location, face) -> placeImage(player, image, width, finalHeight, flags, location, face));
+        task.onImage(__ -> ActionBar.send(player, ChatColor.RED + "There's already an image there!"));
+        task.onCancel(() -> ActionBar.send(player, ChatColor.RED + "Image placing canceled"));
         task.run("Right click a block to continue");
     }
 
@@ -255,14 +256,8 @@ public class ImageCommand {
     }
 
     public static void removeImage(@NotNull Player player) {
-        SelectBlockTask task = new SelectBlockTask(player);
-        task.onSuccess((location, face) -> {
-            FakeImage image = YamipaPlugin.getInstance().getRenderer().getImage(location, face);
-            if (image == null) {
-                ActionBar.send(player, ChatColor.RED + "That is not a valid image!");
-                return;
-            }
-
+        SelectBlockOrImageTask task = new SelectBlockOrImageTask(player);
+        task.onImage(image -> {
             // Check player's command permissions
             if (
                 !player.getUniqueId().equals(image.getPlacedBy().getUniqueId()) &&
@@ -276,7 +271,8 @@ public class ImageCommand {
             // Attempt to remove image
             removeImage(player, image);
         });
-        task.onFailure(() -> ActionBar.send(player, ChatColor.RED + "Image removing canceled"));
+        task.onBlock((location, face) -> ActionBar.send(player, ChatColor.RED + "That is not a valid image!"));
+        task.onCancel(() -> ActionBar.send(player, ChatColor.RED + "Image removing canceled"));
         task.run("Right click an image to continue");
     }
 
@@ -338,17 +334,8 @@ public class ImageCommand {
     }
 
     public static void describeImage(@NotNull Player player) {
-        ImageRenderer renderer = YamipaPlugin.getInstance().getRenderer();
-
-        // Ask user to select fake image
-        SelectBlockTask task = new SelectBlockTask(player);
-        task.onSuccess((location, face) -> {
-            FakeImage image = renderer.getImage(location, face);
-            if (image == null) {
-                ActionBar.send(player, ChatColor.RED + "That is not a valid image!");
-                return;
-            }
-
+        SelectBlockOrImageTask task = new SelectBlockOrImageTask(player);
+        task.onImage(image -> {
             // Separate previous messages
             player.sendMessage("");
 
@@ -405,7 +392,8 @@ public class ImageCommand {
             }
             player.sendMessage(ChatColor.GOLD + "Flags: " + ChatColor.RESET + flagsStr);
         });
-        task.onFailure(() -> ActionBar.send(player, ChatColor.RED + "Image describing canceled"));
+        task.onBlock((location, face) -> ActionBar.send(player, ChatColor.RED + "That is not a valid image!"));
+        task.onCancel(() -> ActionBar.send(player, ChatColor.RED + "Image describing canceled"));
         task.run("Right click the image to describe");
     }
 

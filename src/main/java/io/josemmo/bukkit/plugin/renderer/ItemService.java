@@ -1,14 +1,13 @@
 package io.josemmo.bukkit.plugin.renderer;
 
+import com.comphenix.protocol.events.ListenerPriority;
 import io.josemmo.bukkit.plugin.YamipaPlugin;
 import io.josemmo.bukkit.plugin.commands.ImageCommand;
+import io.josemmo.bukkit.plugin.interaction.SelectFakeItemFrameListener;
 import io.josemmo.bukkit.plugin.storage.ImageFile;
 import io.josemmo.bukkit.plugin.utils.ActionBar;
-import io.josemmo.bukkit.plugin.utils.InteractWithEntityListener;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.Objects;
 
-public class ItemService extends InteractWithEntityListener implements Listener {
+public class ItemService extends SelectFakeItemFrameListener implements Listener {
     private static final Logger LOGGER = Logger.getLogger("ItemService");
     private static final NamespacedKey NSK_FILENAME;
     private static final NamespacedKey NSK_WIDTH;
@@ -188,51 +187,58 @@ public class ItemService extends InteractWithEntityListener implements Listener 
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean onAttack(@NotNull Player player, @NotNull Block block, @NotNull BlockFace face) {
-        ImageRenderer renderer = YamipaPlugin.getInstance().getRenderer();
-        Location location = block.getLocation();
+    protected boolean onLeftClick(@NotNull Player player, int entityId) {
+        YamipaPlugin.getInstance().getScheduler().runInGame(() -> {
+            // Get image selected by player
+            FakeImage image = SelectFakeItemFrameListener.getFakeImage(player);
+            if (image == null) {
+                LOGGER.warning("Failed to get image selected by Player#" + player.getName());
+                return;
+            }
 
-        // Has the player clicked a removable placed image?
-        FakeImage image = renderer.getImage(location, face);
-        if (image == null || !image.hasFlag(FakeImage.FLAG_REMOVABLE)) return true;
+            // Silently ignore non-removable images
+            if (!image.hasFlag(FakeImage.FLAG_REMOVABLE)) {
+                return;
+            }
 
-        // Validate player permissions
-        if (!player.hasPermission("yamipa.item.remove.own")) {
-            ActionBar.send(player, ChatColor.RED + "You're not allowed to remove image items!");
-            return true;
-        }
-        if (
-            !player.getUniqueId().equals(image.getPlacedBy().getUniqueId()) &&
-            !player.hasPermission("yamipa.item.remove")
-        ) {
-            ActionBar.send(player, ChatColor.RED + "You cannot remove image items from other players!");
-            return true;
-        }
+            // Validate player permissions
+            if (!player.hasPermission("yamipa.item.remove.own")) {
+                ActionBar.send(player, ChatColor.RED + "You're not allowed to remove image items!");
+                return;
+            }
+            if (
+                !player.getUniqueId().equals(image.getPlacedBy().getUniqueId()) &&
+                !player.hasPermission("yamipa.item.remove")
+            ) {
+                ActionBar.send(player, ChatColor.RED + "You cannot remove image items from other players!");
+                return;
+            }
 
-        // Attempt to remove image
-        boolean success = ImageCommand.removeImage(player, image);
-        if (!success) {
-            return true;
-        }
+            // Attempt to remove image
+            boolean success = ImageCommand.removeImage(player, image);
+            if (!success) {
+                return;
+            }
 
-        // Drop image item
-        if (player.getGameMode() == GameMode.SURVIVAL && image.hasFlag(FakeImage.FLAG_DROPPABLE)) {
-            ImageFile imageFile = Objects.requireNonNull(image.getFile());
-            ItemStack imageItem = getImageItem(imageFile, 1, image.getWidth(), image.getHeight(), image.getFlags());
-            Location dropLocation = location.clone().add(0.5, -0.5, 0.5).add(face.getDirection());
-            YamipaPlugin.getInstance().getScheduler().runInGame(
-                () -> block.getWorld().dropItem(dropLocation, imageItem),
-                dropLocation,
-                0
-            );
-        }
-
+            // Drop image item in front of player
+            if (player.getGameMode() == GameMode.SURVIVAL && image.hasFlag(FakeImage.FLAG_DROPPABLE)) {
+                ImageFile imageFile = Objects.requireNonNull(image.getFile());
+                ItemStack imageItem = getImageItem(imageFile, 1, image.getWidth(), image.getHeight(), image.getFlags());
+                Location dropLocation = player.getEyeLocation().add(player.getLocation().getDirection().normalize());
+                player.getWorld().dropItem(dropLocation, imageItem);
+            }
+        }, player.getLocation(), 0);
         return false;
     }
 
     @Override
-    public boolean onInteract(@NotNull Player player, @NotNull Block block, @NotNull BlockFace face) {
+    protected boolean onRightClick(@NotNull Player player, int entityId) {
         // Intentionally left blank
         return true;
+    }
+
+    @Override
+    protected @NotNull ListenerPriority getPriority() {
+        return ListenerPriority.LOWEST;
     }
 }
