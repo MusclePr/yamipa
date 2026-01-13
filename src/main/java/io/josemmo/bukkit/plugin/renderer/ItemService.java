@@ -8,6 +8,7 @@ import io.josemmo.bukkit.plugin.storage.ImageFile;
 import io.josemmo.bukkit.plugin.utils.ActionBar;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import org.bukkit.*;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -165,9 +166,13 @@ public class ItemService extends SelectFakeItemFrameListener implements Listener
         }
 
         // Try to place image in world
-        Location location = event.getBlock().getLocation();
-        boolean success = ImageCommand.placeImage(player, image, width, height, flags, location, event.getBlockFace());
-        if (!success) return;
+        // NOTE: We correct the block location to avoid off-by-one errors
+        BlockFace face = event.getBlockFace();
+        Location location = event.getBlock().getLocation().clone().add(face.getOppositeFace().getDirection());
+        boolean success = ImageCommand.placeImage(player, image, width, height, flags, location, face);
+        if (!success) {
+            return;
+        }
 
         // Decrement item from player's inventory
         if (player.getGameMode() != GameMode.CREATIVE) {
