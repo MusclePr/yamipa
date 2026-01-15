@@ -5,7 +5,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.injector.netty.manager.NetworkManagerInjector;
-import io.josemmo.bukkit.plugin.YamipaPlugin;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import io.josemmo.bukkit.plugin.utils.Internals;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import org.bukkit.entity.Player;
@@ -36,17 +36,19 @@ public abstract class FakeEntity {
     }
 
     /**
-     * Try to sleep
+     * Initialize ProtocolLib
      * <p>
-     * NOTE: Will wait synchronously, blocking the invoker thread
-     * @param ms Delay in milliseconds
+     * Fix for ProtocolLib not being ready when the first network packets are being sent by the library.
+     * Without calling this method, some packets are missed when the first player joins the server since boot,
+     * causing images to not be rendered.
      */
-    @SuppressWarnings("SameParameterValue")
-    protected static void tryToSleep(long ms) {
+    public static void initialize() {
+        LOGGER.fine("Initializing ProtocolLib...");
         try {
-            Thread.sleep(ms);
-        } catch (Exception __) {
-            // Fail silently
+            WrappedDataWatcher.Registry.getVectorSerializer();
+            LOGGER.fine("ProtocolLib is now ready");
+        } catch (Exception e) {
+            LOGGER.severe("Failed to initialize ProtocolLib, images may not render for first player joining", e);
         }
     }
 
@@ -88,13 +90,5 @@ public abstract class FakeEntity {
             container.getPacketBundles().write(0, packets);
             tryToSendPacket(player, container);
         }
-    }
-
-    /**
-     * Try to run asynchronous task
-     * @param callback Callback to execute
-     */
-    protected static void tryToRunAsyncTask(@NotNull Runnable callback) {
-        YamipaPlugin.getInstance().getScheduler().execute(callback);
     }
 }

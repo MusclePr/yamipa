@@ -22,6 +22,7 @@ public class Internals {
      * <li> "1.21.10" becomes 2110
      * */
     public static final int MINECRAFT_VERSION;
+    public static final boolean IS_FOLIA;
     private static final CommandDispatcher<?> DISPATCHER;
     private static final CommandMap COMMAND_MAP;
     private static @Nullable Method GET_BUKKIT_SENDER_METHOD = null;
@@ -34,6 +35,16 @@ public class Internals {
             String minorNumber = version.contains(".") ? version.substring(0, version.indexOf(".")) : version;
             String patchNumber = version.contains(".") ? version.substring(version.indexOf(".")+1) : "0";
             MINECRAFT_VERSION = Integer.parseInt(minorNumber) * 100 + Integer.parseInt(patchNumber);
+
+            // Detect Folia
+            boolean isFolia;
+            try {
+                Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+                isFolia = true;
+            } catch (ClassNotFoundException __) {
+                isFolia = false;
+            }
+            IS_FOLIA = isFolia;
 
             // Get "org.bukkit.craftbukkit.CraftServer" references
             Server obcInstance = Bukkit.getServer();

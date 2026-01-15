@@ -6,7 +6,7 @@
 
     <groupId>io.josemmo.bukkit.plugin</groupId>
     <artifactId>YamipaPlugin</artifactId>
-    <version>1.3.4</version>
+    <version>1.4.0</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -16,8 +16,8 @@
 
     <repositories>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+            <id>papermc-repo</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
         <repository>
             <id>minecraft-libraries</id>
@@ -34,11 +34,11 @@
     </repositories>
 
     <dependencies>
-        <!-- https://hub.spigotmc.org/nexus/content/groups/public/org/spigotmc/spigot-api/ -->
+        <!-- https://repo.papermc.io/repository/maven-public/dev/folia/folia-api -->
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.21.10-R0.1-SNAPSHOT</version>
+            <groupId>dev.folia</groupId>
+            <artifactId>folia-api</artifactId>
+            <version>1.21.11-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -89,7 +89,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://jitpack.io/com/github/GriefPrevention/GriefPrevention/ -->
+        <!-- https://github.com/GriefPrevention/GriefPrevention/releases -->
         <dependency>
             <groupId>com.github.GriefPrevention</groupId>
             <artifactId>GriefPrevention</artifactId>
@@ -97,15 +97,15 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://jitpack.io/com/github/TownyAdvanced/towny/ -->
+        <!-- https://github.com/TownyAdvanced/Towny/releases -->
         <dependency>
             <groupId>com.github.TownyAdvanced.Towny</groupId>
             <artifactId>towny</artifactId>
-            <version>0.101.2.7</version>
+            <version>0.102.0.2</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://jitpack.io/com/github/Angeschossen/LandsAPI/ -->
+        <!-- http://github.com/Angeschossen/LandsAPI/releases -->
         <dependency>
             <groupId>com.github.Angeschossen</groupId>
             <artifactId>LandsAPI</artifactId>
