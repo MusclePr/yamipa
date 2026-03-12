@@ -4,7 +4,6 @@ import com.comphenix.protocol.events.PacketContainer;
 import io.josemmo.bukkit.plugin.YamipaPlugin;
 import io.josemmo.bukkit.plugin.storage.CachedMapsFile;
 import io.josemmo.bukkit.plugin.storage.ImageFile;
-import io.josemmo.bukkit.plugin.utils.DirectionUtils;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import io.josemmo.bukkit.plugin.utils.Permissions;
 import org.bukkit.Location;
@@ -63,32 +62,6 @@ public class FakeImage extends FakeEntity {
     // Animation task attributes
     private @Nullable ScheduledFuture<?> task;
     private int currentStep = -1; // Current animation step
-
-    /**
-     * Get image rotation from player eyesight
-     * @param  face     Image block face
-     * @param  location Player eye location
-     * @return          Image rotation
-     */
-    public static @NotNull Rotation getRotationFromPlayerEyesight(@NotNull BlockFace face, @NotNull Location location) {
-        // Images placed on N/S/E/W faces never have rotation
-        if (face != BlockFace.UP && face != BlockFace.DOWN) {
-            return Rotation.NONE;
-        }
-
-        // Top and down images depend on where player is looking
-        BlockFace eyeDirection = DirectionUtils.getCardinalDirection(location.getYaw());
-        switch (eyeDirection) {
-            case EAST:
-                return (face == BlockFace.DOWN) ? Rotation.CLOCKWISE_135 : Rotation.CLOCKWISE_45;
-            case SOUTH:
-                return Rotation.CLOCKWISE;
-            case WEST:
-                return (face == BlockFace.DOWN) ? Rotation.CLOCKWISE_45 : Rotation.CLOCKWISE_135;
-            default:
-                return Rotation.NONE;
-        }
-    }
 
     /**
      * Get maximum image dimension

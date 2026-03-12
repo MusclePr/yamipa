@@ -7,6 +7,7 @@ import io.josemmo.bukkit.plugin.renderer.ImageRenderer;
 import io.josemmo.bukkit.plugin.renderer.ItemService;
 import io.josemmo.bukkit.plugin.storage.ImageFile;
 import io.josemmo.bukkit.plugin.storage.ImageStorage;
+import io.josemmo.bukkit.plugin.utils.BlockFaceWithRotation;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import io.josemmo.bukkit.plugin.utils.Permissions;
 import io.josemmo.bukkit.plugin.utils.ActionBar;
@@ -212,7 +213,10 @@ public class ImageCommand {
 
         // Ask player where to place image
         SelectBlockOrImageTask task = new SelectBlockOrImageTask(player);
-        task.onBlock((location, face) -> placeImage(player, image, width, finalHeight, flags, location, face));
+        task.onBlock((location, face) -> {
+            BlockFaceWithRotation faceWithRotation = BlockFaceWithRotation.fromPlayerEyesight(face, player.getEyeLocation());
+            placeImage(player, image, width, finalHeight, flags, location, faceWithRotation);
+        });
         task.onImage(__ -> ActionBar.send(player, ChatColor.RED + "There's already an image there!"));
         task.onCancel(() -> ActionBar.send(player, ChatColor.RED + "Image placing canceled"));
         task.run("Right click a block to continue");
@@ -225,14 +229,14 @@ public class ImageCommand {
         int height,
         int flags,
         @NotNull Location location,
-        @NotNull BlockFace face
+        @NotNull BlockFaceWithRotation blockFaceWithRotation
     ) {
         ImageRenderer renderer = YamipaPlugin.getInstance().getRenderer();
 
         // Create new fake image instance
-        Rotation rotation = FakeImage.getRotationFromPlayerEyesight(face, player.getEyeLocation());
-        FakeImage fakeImage = new FakeImage(image.getFilename(), location, face, rotation,
-            width, height, new Date(), player, flags);
+        BlockFace blockFace = blockFaceWithRotation.getBlockFace();
+        Rotation rotation = blockFaceWithRotation.getRotation();
+        FakeImage fakeImage = new FakeImage(image.getFilename(), location, blockFace, rotation, width, height, new Date(), player, flags);
 
         // Make sure image can be placed
         for (Location loc : fakeImage.getAllLocations()) {
@@ -240,7 +244,7 @@ public class ImageCommand {
                 ActionBar.send(player, ChatColor.RED + "You're not allowed to place an image here!");
                 return false;
             }
-            if (renderer.getImage(loc, face) != null) {
+            if (renderer.getImage(loc, blockFace) != null) {
                 ActionBar.send(player, ChatColor.RED + "There's already an image there!");
                 return false;
             }
