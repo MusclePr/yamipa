@@ -344,6 +344,27 @@ public class ImageCommandBridge {
                 ImageCommand.removeImage(player);
             });
 
+        // Remove at subcommand
+        root.addSubcommand("remove-at")
+            .withPermission("yamipa.command.remove-at")
+            .withArgument(new IntegerArgument("x"))
+            .withArgument(new IntegerArgument("y"))
+            .withArgument(new IntegerArgument("z"))
+            .withArgument(new WorldArgument("world"))
+            .withArgument(new BlockFaceWithRotationArgument("face"))
+            .executes((sender, args) -> {
+                ImageCommand.removeImageAt(
+                    sender,
+                    new Location(
+                        (World) args[4],            // world
+                        (int) args[1],              // x
+                        (int) args[2],              // y
+                        (int) args[3]               // z
+                    ),
+                    (BlockFaceWithRotation) args[5] // face
+                );
+            });
+
         // Top subcommand
         root.addSubcommand("top")
             .withPermission("yamipa.command.top", "yamipa.top")

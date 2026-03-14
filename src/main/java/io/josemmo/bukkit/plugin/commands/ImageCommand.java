@@ -65,6 +65,9 @@ public class ImageCommand {
         if (s.hasPermission("yamipa.command.remove.own") || s.hasPermission("yamipa.remove")) {
             s.sendMessage(ChatColor.AQUA + cmd + " remove" + ChatColor.RESET + " - Remove a single placed image");
         }
+        if (s.hasPermission("yamipa.command.remove-at")) {
+            s.sendMessage(ChatColor.AQUA + cmd + " remove-at <x y z wo> <fa>" + ChatColor.RESET + " - Remove at");
+        }
         if (s.hasPermission("yamipa.command.top") || s.hasPermission("yamipa.top")) {
             s.sendMessage(ChatColor.AQUA + cmd + " top" + ChatColor.RESET + " - List players with the most images");
         }
@@ -314,6 +317,25 @@ public class ImageCommand {
         // Trigger image removal
         YamipaPlugin.getInstance().getRenderer().removeImage(image);
         return true;
+    }
+
+    public static void removeImageAt(
+        @NotNull CommandSender sender,
+        @NotNull Location location,
+        @NotNull BlockFaceWithRotation blockFaceWithRotation
+    ) {
+        ImageRenderer renderer = YamipaPlugin.getInstance().getRenderer();
+
+        // Get image from location
+        FakeImage image = renderer.getImage(location, blockFaceWithRotation.getBlockFace());
+        if (image == null) {
+            sender.sendMessage(ChatColor.RED + "There is no image at this location!");
+            return;
+        }
+
+        // Trigger image removal
+        renderer.removeImage(image);
+        sender.sendMessage(ChatColor.GREEN + "Removed image " + image.getFilename());
     }
 
     public static void clearImages(

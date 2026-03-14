@@ -107,6 +107,7 @@ This plugin adds the following commands:
 - `/image place <filename> <w> [<h>] [<flags>]`: Start a UI dialog to place an image of size `w`x`h` blocks.
 - `/image place-at <x y z world> <face> <filename> <w> [<h>] [<flags>]`: Place an image at the given coordinates.
 - `/image remove`: Start UI dialog to remove a placed image from the world without deleting the image file.
+- `/image remove-at <x y z world> <face>`: Remove the image at the given coordinates.
 - `/image top`: List players with the most placed images.
 
 ### Examples
@@ -129,6 +130,8 @@ This plugin adds the following commands:
   `/image place-at 100 200 300 world NORTH "imagename.jpg" 3`
 - Start the UI dialog to remove a placed image while keeping the original file\
   `/image remove`
+- Remove a placed image at a given block, without player interaction\
+  `/image remove-at 100 200 300 world NORTH`
 - Remove all placed images in a radius of 5 blocks around the spawn\
   `/image clear 0 0 world 5`
 - Remove all images placed by "EvilPlayer" in a radius of 100 blocks in the nether\
@@ -152,6 +155,7 @@ Yamipa defines the following permissions:
 | `yamipa.command.place-at`   |     OPs     | To use the `/image place-at` command                            |
 | `yamipa.command.remove`     |     OPs     | To use the `/image remove` command                              |
 | `yamipa.command.remove.own` |     OPs     | Same as previous, but only for images placed by the same player |
+| `yamipa.command.remove-at`  |     OPs     | To use the `/image remove-at` command                           |
 | `yamipa.command.top`        |     OPs     | To use the `/image top` command                                 |
 | `yamipa.item.place`         | All players | To place image items                                            |
 | `yamipa.item.remove`        | All players | To remove image items (that have the `REMO` flag)               |
