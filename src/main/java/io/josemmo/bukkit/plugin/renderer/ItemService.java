@@ -171,7 +171,7 @@ public class ItemService extends SelectFakeItemFrameListener implements Listener
         BlockFace face = event.getBlockFace();
         BlockFaceWithRotation faceWithRotation = BlockFaceWithRotation.fromPlayerEyesight(face, player.getEyeLocation());
         Location location = event.getBlock().getLocation().clone().add(face.getOppositeFace().getDirection());
-        boolean success = ImageCommand.placeImage(player, image, width, height, flags, location, faceWithRotation);
+        boolean success = ImageCommand.placeImageAt(player, image, width, height, flags, location, faceWithRotation);
         if (!success) {
             return;
         }

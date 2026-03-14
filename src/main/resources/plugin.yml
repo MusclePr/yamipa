@@ -43,6 +43,7 @@ permissions:
       yamipa.command.give: true
       yamipa.command.list: true
       yamipa.command.place: true
+      yamipa.command.place-at: true
       yamipa.command.remove: true
       yamipa.command.top: true
 
@@ -58,6 +59,8 @@ permissions:
   yamipa.command.list:
     default: op
   yamipa.command.place:
+    default: op
+  yamipa.command.place-at:
     default: op
   yamipa.command.remove:
     default: op

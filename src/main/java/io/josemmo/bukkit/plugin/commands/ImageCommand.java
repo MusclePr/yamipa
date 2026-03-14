@@ -42,22 +42,25 @@ public class ImageCommand {
         s.sendMessage(ChatColor.BOLD + "=== Yamipa Plugin Help ===");
         s.sendMessage(ChatColor.AQUA + cmd + ChatColor.RESET + " - Show this help");
         if (s.hasPermission("yamipa.command.clear") || s.hasPermission("yamipa.clear")) {
-            s.sendMessage(ChatColor.AQUA + cmd + " clear <x z w> <r> [<player>]" + ChatColor.RESET + " - Remove placed images");
+            s.sendMessage(ChatColor.AQUA + cmd + " clear <x z wo> <r> [<player>]" + ChatColor.RESET + " - Remove placed images");
         }
         if (s.hasPermission("yamipa.command.describe") || s.hasPermission("yamipa.describe")) {
             s.sendMessage(ChatColor.AQUA + cmd + " describe" + ChatColor.RESET + " - Describe placed image");
         }
         if (s.hasPermission("yamipa.command.download") || s.hasPermission("yamipa.download")) {
-            s.sendMessage(ChatColor.AQUA + cmd + " download <url> <filename>" + ChatColor.RESET + " - Download image");
+            s.sendMessage(ChatColor.AQUA + cmd + " download <url> <file>" + ChatColor.RESET + " - Download image");
         }
         if (s.hasPermission("yamipa.command.give") || s.hasPermission("yamipa.give")) {
-            s.sendMessage(ChatColor.AQUA + cmd + " give <p> <filename> <#> <w> [<h>] [<f>]" + ChatColor.RESET + " - Give items");
+            s.sendMessage(ChatColor.AQUA + cmd + " give <p> <file> <#> <w> [<h>] [<f>]" + ChatColor.RESET + " - Give items");
         }
         if (s.hasPermission("yamipa.command.list") || s.hasPermission("yamipa.list")) {
             s.sendMessage(ChatColor.AQUA + cmd + " list [<page>]" + ChatColor.RESET + " - List all images");
         }
         if (s.hasPermission("yamipa.command.place") || s.hasPermission("yamipa.place")) {
-            s.sendMessage(ChatColor.AQUA + cmd + " place <filename> <w> [<h>] [<f>]" + ChatColor.RESET + " - Place image");
+            s.sendMessage(ChatColor.AQUA + cmd + " place <file> <w> [<h>] [<f>]" + ChatColor.RESET + " - Place image");
+        }
+        if (s.hasPermission("yamipa.command.place-at")) {
+            s.sendMessage(ChatColor.AQUA + cmd + " place-at <x y z wo> <fa> <file> <w> [<h>] [<f>]" + ChatColor.RESET + " - Place at");
         }
         if (s.hasPermission("yamipa.command.remove.own") || s.hasPermission("yamipa.remove")) {
             s.sendMessage(ChatColor.AQUA + cmd + " remove" + ChatColor.RESET + " - Remove a single placed image");
@@ -203,27 +206,18 @@ public class ImageCommand {
         int height,
         int flags
     ) {
-        // Get image size in blocks
-        Dimension sizeInPixels = image.getSize();
-        if (sizeInPixels == null) {
-            player.sendMessage(ChatColor.RED + "The requested file is not a valid image");
-            return;
-        }
-        final int finalHeight = (height == 0) ? FakeImage.getProportionalHeight(sizeInPixels, player, width) : height;
-
-        // Ask player where to place image
         SelectBlockOrImageTask task = new SelectBlockOrImageTask(player);
         task.onBlock((location, face) -> {
             BlockFaceWithRotation faceWithRotation = BlockFaceWithRotation.fromPlayerEyesight(face, player.getEyeLocation());
-            placeImage(player, image, width, finalHeight, flags, location, faceWithRotation);
+            placeImageAt(player, image, width, height, flags, location, faceWithRotation);
         });
         task.onImage(__ -> ActionBar.send(player, ChatColor.RED + "There's already an image there!"));
         task.onCancel(() -> ActionBar.send(player, ChatColor.RED + "Image placing canceled"));
         task.run("Right click a block to continue");
     }
 
-    public static boolean placeImage(
-        @NotNull Player player,
+    public static boolean placeImageAt(
+        @NotNull CommandSender sender,
         @NotNull ImageFile image,
         int width,
         int height,
@@ -232,27 +226,55 @@ public class ImageCommand {
         @NotNull BlockFaceWithRotation blockFaceWithRotation
     ) {
         ImageRenderer renderer = YamipaPlugin.getInstance().getRenderer();
+        boolean senderIsPlayer = (sender instanceof Player);
+
+        // Get image size in blocks
+        Dimension sizeInPixels = image.getSize();
+        if (sizeInPixels == null) {
+            sender.sendMessage(ChatColor.RED + "The requested file is not a valid image");
+            return false;
+        }
+        int actualHeight = (height == 0) ? FakeImage.getProportionalHeight(sizeInPixels, sender, width) : height;
 
         // Create new fake image instance
         BlockFace blockFace = blockFaceWithRotation.getBlockFace();
         Rotation rotation = blockFaceWithRotation.getRotation();
-        FakeImage fakeImage = new FakeImage(image.getFilename(), location, blockFace, rotation, width, height, new Date(), player, flags);
+        FakeImage fakeImage = new FakeImage(
+            image.getFilename(),
+            location,
+            blockFace,
+            rotation,
+            width,
+            actualHeight,
+            new Date(),
+            senderIsPlayer ? (Player) sender : Bukkit.getOfflinePlayer(FakeImage.UNKNOWN_PLAYER_ID),
+            flags
+        );
 
         // Make sure image can be placed
         for (Location loc : fakeImage.getAllLocations()) {
-            if (!Permissions.canBuild(player, loc)) {
-                ActionBar.send(player, ChatColor.RED + "You're not allowed to place an image here!");
+            if (senderIsPlayer && !Permissions.canBuild((Player) sender, loc)) {
+                ActionBar.send((Player) sender, ChatColor.RED + "You're not allowed to place an image here!");
                 return false;
             }
             if (renderer.getImage(loc, blockFace) != null) {
-                ActionBar.send(player, ChatColor.RED + "There's already an image there!");
+                String errorMessage = ChatColor.RED + "There's already an image there!";
+                if (senderIsPlayer) {
+                    ActionBar.send((Player) sender, errorMessage);
+                } else {
+                    sender.sendMessage(errorMessage);
+                }
                 return false;
             }
         }
 
-        // Show loading status to player
-        ActionBar loadingActionBar = ActionBar.repeat(player, ChatColor.AQUA + "Loading image...");
-        fakeImage.setOnLoadedListener(loadingActionBar::clear);
+        // Show feedback to sender
+        if (senderIsPlayer) {
+            ActionBar loadingActionBar = ActionBar.repeat((Player) sender, ChatColor.AQUA + "Loading image...");
+            fakeImage.setOnLoadedListener(loadingActionBar::clear);
+        } else {
+            sender.sendMessage(ChatColor.GREEN + "Placed image " + fakeImage.getFilename());
+        }
 
         // Add fake image to renderer
         renderer.addImage(fakeImage);

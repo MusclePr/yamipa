@@ -6,6 +6,7 @@ import io.josemmo.bukkit.plugin.YamipaPlugin;
 import io.josemmo.bukkit.plugin.commands.arguments.*;
 import io.josemmo.bukkit.plugin.renderer.FakeImage;
 import io.josemmo.bukkit.plugin.storage.ImageFile;
+import io.josemmo.bukkit.plugin.utils.BlockFaceWithRotation;
 import io.josemmo.bukkit.plugin.utils.Internals;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import org.bukkit.Location;
@@ -73,6 +74,7 @@ public class ImageCommandBridge {
                 "yamipa.command.give", "yamipa.give",
                 "yamipa.command.list", "yamipa.list",
                 "yamipa.command.place", "yamipa.place",
+                "yamipa.command.place-at",
                 "yamipa.command.remove.own", "yamipa.remove",
                 "yamipa.command.top", "yamipa.top"
             )
@@ -254,6 +256,85 @@ public class ImageCommandBridge {
                     FakeImage.DEFAULT_PLACE_FLAGS
                 );
             });
+
+        // Place at subcommand
+        root.addSubcommand("place-at")
+            .withPermission("yamipa.command.place-at")
+            .withArgument(new IntegerArgument("x"))
+            .withArgument(new IntegerArgument("y"))
+            .withArgument(new IntegerArgument("z"))
+            .withArgument(new WorldArgument("world"))
+            .withArgument(new BlockFaceWithRotationArgument("face"))
+            .withArgument(new ImageFileArgument("filename"))
+            .withArgument(new ImageDimensionArgument("width"))
+            .withArgument(new ImageDimensionArgument("height"))
+            .withArgument(new ImageFlagsArgument("flags", FakeImage.DEFAULT_PLACE_FLAGS))
+            .executes((sender, args) -> {
+                ImageCommand.placeImageAt(
+                    sender,
+                    (ImageFile) args[6],            // filename
+                    (int) args[7],                  // width
+                    (int) args[8],                  // height
+                    (int) args[9],                  // flags
+                    new Location(
+                        (World) args[4],            // world
+                        (int) args[1],              // x
+                        (int) args[2],              // y
+                        (int) args[3]               // z
+                    ),
+                    (BlockFaceWithRotation) args[5] // face
+                );
+            });
+        root.addSubcommand("place-at")
+            .withPermission("yamipa.command.place-at")
+            .withArgument(new IntegerArgument("x"))
+            .withArgument(new IntegerArgument("y"))
+            .withArgument(new IntegerArgument("z"))
+            .withArgument(new WorldArgument("world"))
+            .withArgument(new BlockFaceWithRotationArgument("face"))
+            .withArgument(new ImageFileArgument("filename"))
+            .withArgument(new ImageDimensionArgument("width"))
+            .withArgument(new ImageDimensionArgument("height"))
+            .executes((sender, args) -> {
+                ImageCommand.placeImageAt(
+                    sender,
+                    (ImageFile) args[6],            // filename
+                    (int) args[7],                  // width
+                    (int) args[8],                  // height
+                    FakeImage.DEFAULT_PLACE_FLAGS,
+                    new Location(
+                        (World) args[4],            // world
+                        (int) args[1],              // x
+                        (int) args[2],              // y
+                        (int) args[3]               // z
+                    ),
+                    (BlockFaceWithRotation) args[5] // face
+                );
+            });
+        root.addSubcommand("place-at")
+            .withPermission("yamipa.command.place-at")
+            .withArgument(new IntegerArgument("x"))
+            .withArgument(new IntegerArgument("y"))
+            .withArgument(new IntegerArgument("z"))
+            .withArgument(new WorldArgument("world"))
+            .withArgument(new BlockFaceWithRotationArgument("face"))
+            .withArgument(new ImageFileArgument("filename"))
+            .withArgument(new ImageDimensionArgument("width"))
+            .executes((sender, args) -> {
+                ImageCommand.placeImageAt(
+                    sender,
+                    (ImageFile) args[6],            // filename
+                    (int) args[7],                  // width
+                    0,
+                    FakeImage.DEFAULT_PLACE_FLAGS,
+                    new Location(
+                        (World) args[4],            // world
+                        (int) args[1],              // x
+                        (int) args[2],              // y
+                        (int) args[3]               // z
+                    ),
+                    (BlockFaceWithRotation) args[5] // face
+                );
             });
 
         // Remove subcommand
