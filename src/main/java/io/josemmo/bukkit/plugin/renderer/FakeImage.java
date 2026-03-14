@@ -39,16 +39,16 @@ public class FakeImage extends FakeEntity {
     public static final int DEFAULT_GIVE_FLAGS = FLAG_ANIMATABLE | FLAG_REMOVABLE | FLAG_DROPPABLE;
 
     // Instance properties
-    private final String filename;
-    private final Location location;
-    private final BlockFace face;
-    private final Rotation rotation;
+    private final @NotNull String filename;
+    private final @NotNull Location location;
+    private final @NotNull BlockFace face;
+    private final @NotNull Rotation rotation;
     private final int width;
     private final int height;
-    private final Date placedAt;
-    private final OfflinePlayer placedBy;
+    private final @Nullable Date placedAt;
+    private final @NotNull OfflinePlayer placedBy;
     private final int flags;
-    private final BiFunction<Integer, Integer, Vector> getLocationVector;
+    private final @NotNull BiFunction<Integer, Integer, Vector> getLocationVector;
     private final Set<Player> observingPlayers = new HashSet<>();
     private final List<Runnable> spawnCallbacks = new ArrayList<>();
     private @Nullable Runnable onLoadedListener = null;
