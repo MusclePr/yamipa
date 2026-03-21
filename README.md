@@ -104,8 +104,10 @@ This plugin adds the following commands:
 - `/image download <url> <filename>`: Download an image from a URL and place it in the images directory.
 - `/image give <player> <filename> <amount> <w> [<h>] [<flags>]`: Give image items that can be placed later to a player.
 - `/image list [<page>]`: List all available files in the images directory.
-- `/image place <filename> <w> [<h>] [<flags>]`: Place an image of size `w`x`h` blocks.
-- `/image remove`: Remove a placed image from the world without deleting the image file.
+- `/image place <filename> <w> [<h>] [<flags>]`: Start a UI dialog to place an image of size `w`x`h` blocks.
+- `/image place-at <x y z world> <face> <filename> <w> [<h>] [<flags>]`: Place an image at the given coordinates.
+- `/image remove`: Start UI dialog to remove a placed image from the world without deleting the image file.
+- `/image remove-at <x y z world> <face>`: Remove the image at the given coordinates.
 - `/image top`: List players with the most placed images.
 
 ### Examples
@@ -118,14 +120,18 @@ This plugin adds the following commands:
   `/image give TestPlayer "test.jpg" 10 3 5`
 - Give 10 image items to "TestPlayer" that will not drop an image item when removed\
   `/image give TestPlayer "test.jpg" 10 3 5 -DROP`
-- Start the dialog to place an image with a width of 3 blocks and auto height\
+- Start the UI dialog to place an image with a width of 3 blocks and auto height\
   `/image place "imagename.jpg" 3`
-- Start the dialog to place a 3-blocks wide and 2-blocks high image\
+- Start the UI dialog to place a 3-blocks wide and 2-blocks high image\
   `/image place "imagename.jpg" 3 2`
-- Start the dialog to place an image that glows in the dark\
+- Start the UI dialog to place an image that glows in the dark\
   `/image place "imagename.jpg" 3 2 +GLOW`
-- Start the dialog to remove a placed image while keeping the original file\
+- Place an image at a given block, facing north, without player interaction\
+  `/image place-at 100 200 300 world NORTH "imagename.jpg" 3`
+- Start the UI dialog to remove a placed image while keeping the original file\
   `/image remove`
+- Remove a placed image at a given block, without player interaction\
+  `/image remove-at 100 200 300 world NORTH`
 - Remove all placed images in a radius of 5 blocks around the spawn\
   `/image clear 0 0 world 5`
 - Remove all images placed by "EvilPlayer" in a radius of 100 blocks in the nether\
@@ -146,8 +152,10 @@ Yamipa defines the following permissions:
 | `yamipa.command.give`       |     OPs     | To use the `/image give` command                                |
 | `yamipa.command.list`       |     OPs     | To use the `/image list` command                                |
 | `yamipa.command.place`      |     OPs     | To use the `/image place` command                               |
+| `yamipa.command.place-at`   |     OPs     | To use the `/image place-at` command                            |
 | `yamipa.command.remove`     |     OPs     | To use the `/image remove` command                              |
 | `yamipa.command.remove.own` |     OPs     | Same as previous, but only for images placed by the same player |
+| `yamipa.command.remove-at`  |     OPs     | To use the `/image remove-at` command                           |
 | `yamipa.command.top`        |     OPs     | To use the `/image top` command                                 |
 | `yamipa.item.place`         | All players | To place image items                                            |
 | `yamipa.item.remove`        | All players | To remove image items (that have the `REMO` flag)               |

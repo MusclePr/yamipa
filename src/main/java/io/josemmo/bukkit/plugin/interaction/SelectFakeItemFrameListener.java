@@ -10,15 +10,15 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import io.josemmo.bukkit.plugin.YamipaPlugin;
 import io.josemmo.bukkit.plugin.renderer.FakeImage;
 import io.josemmo.bukkit.plugin.renderer.FakeItemFrame;
+import io.josemmo.bukkit.plugin.renderer.ImageRenderer;
 import io.josemmo.bukkit.plugin.utils.Internals;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.List;
 
 public abstract class SelectFakeItemFrameListener implements PacketListener {
     private static final int MAX_BLOCK_DISTANCE = 5;
@@ -29,26 +29,27 @@ public abstract class SelectFakeItemFrameListener implements PacketListener {
      * @return        Fake image instance or <code>null</code> if not found
      */
     public static @Nullable FakeImage getFakeImage(@NotNull Player player) {
-        // Get target block in range
-        List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, MAX_BLOCK_DISTANCE);
-        if (lastTwoTargetBlocks.size() != 2) {
-            return null;
-        }
-        Block targetBlock = lastTwoTargetBlocks.get(1);
-        if (!targetBlock.getType().isSolid()) {
-            return null;
+        ImageRenderer renderer = YamipaPlugin.getInstance().getRenderer();
+
+        // Get the closest fake image within player's line of sight
+        BlockIterator iterator = new BlockIterator(player, MAX_BLOCK_DISTANCE);
+        Block previousBlock = null;
+        while (iterator.hasNext()) {
+            Block currentBlock = iterator.next();
+            if (previousBlock != null) {
+                BlockFace currentBlockFace = currentBlock.getFace(previousBlock);
+                if (currentBlockFace != null) {
+                    FakeImage image = renderer.getImage(currentBlock.getLocation(), currentBlockFace);
+                    if (image != null) {
+                        return image;
+                    }
+                }
+            }
+            previousBlock = currentBlock;
         }
 
-        // Get target block face
-        Block adjacentBlock = lastTwoTargetBlocks.get(0);
-        BlockFace targetBlockFace = targetBlock.getFace(adjacentBlock);
-        if (targetBlockFace == null) {
-            return null;
-        }
-
-        // Get fake image instance
-        Location targetBlockLocation = targetBlock.getLocation();
-        return YamipaPlugin.getInstance().getRenderer().getImage(targetBlockLocation, targetBlockFace);
+        // No fake image found
+        return null;
     }
 
     /**

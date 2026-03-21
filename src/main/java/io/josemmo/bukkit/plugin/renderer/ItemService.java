@@ -6,6 +6,7 @@ import io.josemmo.bukkit.plugin.commands.ImageCommand;
 import io.josemmo.bukkit.plugin.interaction.SelectFakeItemFrameListener;
 import io.josemmo.bukkit.plugin.storage.ImageFile;
 import io.josemmo.bukkit.plugin.utils.ActionBar;
+import io.josemmo.bukkit.plugin.utils.BlockFaceWithRotation;
 import io.josemmo.bukkit.plugin.utils.Logger;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
@@ -168,8 +169,9 @@ public class ItemService extends SelectFakeItemFrameListener implements Listener
         // Try to place image in world
         // NOTE: We correct the block location to avoid off-by-one errors
         BlockFace face = event.getBlockFace();
+        BlockFaceWithRotation faceWithRotation = BlockFaceWithRotation.fromPlayerEyesight(face, player.getEyeLocation());
         Location location = event.getBlock().getLocation().clone().add(face.getOppositeFace().getDirection());
-        boolean success = ImageCommand.placeImage(player, image, width, height, flags, location, face);
+        boolean success = ImageCommand.placeImageAt(player, image, width, height, flags, location, faceWithRotation);
         if (!success) {
             return;
         }
