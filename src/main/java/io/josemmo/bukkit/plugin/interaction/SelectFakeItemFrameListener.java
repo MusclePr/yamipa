@@ -11,7 +11,7 @@ import io.josemmo.bukkit.plugin.YamipaPlugin;
 import io.josemmo.bukkit.plugin.renderer.FakeImage;
 import io.josemmo.bukkit.plugin.renderer.FakeItemFrame;
 import io.josemmo.bukkit.plugin.renderer.ImageRenderer;
-import io.josemmo.bukkit.plugin.utils.Internals;
+import io.josemmo.bukkit.plugin.utils.MinecraftVersion;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -98,10 +98,10 @@ public abstract class SelectFakeItemFrameListener implements PacketListener {
 
         // Get action
         EnumWrappers.EntityUseAction action;
-        if (Internals.MINECRAFT_VERSION < 1700) {
-            action = event.getPacket().getEntityUseActions().read(0);
-        } else {
+        if (MinecraftVersion.CURRENT.isAtLeast(MinecraftVersion.V1_17)) {
             action = event.getPacket().getEnumEntityUseActions().read(0).getAction();
+        } else {
+            action = event.getPacket().getEntityUseActions().read(0);
         }
 
         // Handle event

@@ -4,6 +4,7 @@ import io.josemmo.bukkit.plugin.commands.ImageCommandBridge;
 import io.josemmo.bukkit.plugin.renderer.*;
 import io.josemmo.bukkit.plugin.storage.ImageStorage;
 import io.josemmo.bukkit.plugin.utils.Logger;
+import io.josemmo.bukkit.plugin.utils.MinecraftVersion;
 import io.josemmo.bukkit.plugin.utils.Scheduler;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
@@ -98,7 +99,8 @@ public class YamipaPlugin extends JavaPlugin {
         // Initialize logger
         verbose = config.getBoolean("verbose");
         if (verbose) {
-            LOGGER.info("Running on VERBOSE mode");
+            LOGGER.fine("Running on VERBOSE mode");
+            LOGGER.fine("Detected server with Minecraft " + MinecraftVersion.CURRENT);
         }
 
         // Create scheduler
