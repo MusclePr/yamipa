@@ -156,7 +156,7 @@ public class YamipaPlugin extends JavaPlugin {
             return "0-9";
         };
         metrics = new Metrics(this, BSTATS_PLUGIN_ID);
-        metrics.addCustomChart(new SimplePie("animate_images", () -> animateImages ? "true" : "false"));
+        metrics.addCustomChart(new SimplePie("animate_images", () -> Boolean.toString(animateImages)));
         metrics.addCustomChart(new SimplePie("number_of_image_files", () -> toStats.apply(storage.size())));
         metrics.addCustomChart(new SimplePie("number_of_placed_images", () -> toStats.apply(renderer.size())));
     }
