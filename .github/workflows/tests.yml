@@ -50,7 +50,8 @@ jobs:
               startsWith(matrix.version, '1.19') && '17' ||
               startsWith(matrix.version, '1.20') && '21' ||
               startsWith(matrix.version, '1.21') && '25' ||
-              '26'
+              startsWith(matrix.version, '26.1') && '26' ||
+              '27'
             }}
 
       # Setup Node.js
